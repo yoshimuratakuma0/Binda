@@ -1,7 +1,7 @@
 package com.legstart.binda
 
-import com.legstart.core.BoundTask
+import com.legstart.core_android.SingleTask
 
 interface FruitRepository {
-    suspend fun fetchFruits(): List<String>
+    fun fetchFruits(): SingleTask<List<String>>
 }

@@ -1,10 +1,10 @@
 package com.legstart.core_android
 
-import androidx.lifecycle.LifecycleOwner
 import com.legstart.core.BoundTask
+import com.legstart.core.TaskScope
 
 
 interface SingleTask<T> {
-    fun bindTo(lifecycleOwner: LifecycleOwner): BoundTask<T>
+    fun bindTo(taskScope: TaskScope): BoundTask<T>
     fun cancel()
 }
