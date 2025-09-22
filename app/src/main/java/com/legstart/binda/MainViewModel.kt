@@ -6,9 +6,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class MainViewModel constructor(
+class MainViewModel(
     private val fruitRepository: FruitRepository,
-): ViewModel() {
+) : ViewModel() {
     private val _fruits = MutableStateFlow<List<String>>(emptyList())
     val fruits = _fruits.asStateFlow()
 
