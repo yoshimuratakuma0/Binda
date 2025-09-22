@@ -13,3 +13,19 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Android Studio/IDE-specific project files (safe to ignore)
+/.idea/AndroidProjectSystem.xml
+/.idea/compiler.xml
+/.idea/deploymentTargetSelector.xml
+/.idea/gradle.xml
+/.idea/kotlinc.xml
+/.idea/migrations.xml
+/.idea/runConfigurations.xml
+# Plugin/state files (already covered: workspace.xml, caches, libraries)
+/.idea/copilot.data.migration.*.xml
+# Optional to ignore if you don't want to share these with the team:
+# /.idea/inspectionProfiles/
+# /.idea/vcs.xml
+# If your IDE uses a folder for run configurations in the future:
+# /.idea/runConfigurations/
