@@ -4,14 +4,19 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.legstart.binda.ui.theme.BindaTheme
@@ -27,32 +32,52 @@ class MainActivity : ComponentActivity() {
         setContent {
             BindaTheme {
                 val fruits by viewModel.fruits.collectAsStateWithLifecycle()
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    LazyColumn(
-                        contentPadding = innerPadding,
-                    ) {
-                        items(fruits) { fruit ->
-                            Text(text = fruit)
-                        }
-                    }
-                }
+                val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+                Screen(
+                    fruits = fruits,
+                    isLoading = isLoading,
+                    modifier = Modifier.fillMaxSize(),
+                )
             }
         }
     }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+fun Screen(
+    fruits: List<String>,
+    isLoading: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    Scaffold(modifier = modifier.fillMaxSize()) { innerPadding ->
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = Color(0x80000000)),
+                contentAlignment = Alignment.Center,
+            ) {
+                CircularProgressIndicator(modifier = Modifier)
+            }
+        }
+        LazyColumn(
+            contentPadding = innerPadding,
+        ) {
+            items(fruits) { fruit ->
+                Text(text = fruit)
+            }
+        }
+    }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
-fun GreetingPreview() {
+private fun LoadingPreview() {
     BindaTheme {
-        Greeting("Android")
+        Screen(
+            fruits = listOf("banana", "apple", "orange"),
+            isLoading = true,
+            modifier = Modifier.fillMaxSize(),
+        )
     }
 }
