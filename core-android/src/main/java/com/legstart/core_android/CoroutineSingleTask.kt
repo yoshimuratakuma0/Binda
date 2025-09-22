@@ -18,8 +18,6 @@ class CoroutineSingleTask<T>(
                 onError: (Throwable) -> Unit,
                 onCancel: () -> Unit
             ) {
-                cancelable?.cancel()
-
                 cancelable = taskScope.launch {
                     try {
                         val result = runBlocking { block() }
