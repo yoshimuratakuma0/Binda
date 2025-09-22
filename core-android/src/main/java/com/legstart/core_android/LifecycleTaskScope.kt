@@ -5,11 +5,14 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.legstart.core.Cancelable
 import com.legstart.core.TaskScope
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class LifecycleTaskScope(
-    private val lifecycleOwner: LifecycleOwner
+    private val lifecycleOwner: LifecycleOwner,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : TaskScope {
     private var job: Job? = null
 
@@ -22,7 +25,7 @@ class LifecycleTaskScope(
         }
 
         lifecycleOwner.lifecycle.addObserver(observer)
-        job = lifecycleOwner.lifecycleScope.launch {
+        job = lifecycleOwner.lifecycleScope.launch(dispatcher) {
             task()
         }
         return object : Cancelable {
