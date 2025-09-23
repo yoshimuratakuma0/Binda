@@ -1,4 +1,4 @@
-package com.legstart.core_android
+package com.legstart.core_android.scopes
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -6,10 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertTrue
-import org.junit.Assert.fail
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 
@@ -34,7 +31,7 @@ class CoroutineTaskScopeTest {
         val cancelable = coroutineTaskScope.launch(task)
 
         // Then
-        assertNotNull("Cancelable should not be null", cancelable)
+        Assert.assertNotNull("Cancelable should not be null", cancelable)
     }
 
     @Test
@@ -50,7 +47,7 @@ class CoroutineTaskScopeTest {
         Thread.sleep(10)
 
         // Then
-        assertTrue("Task should be executed", taskExecuted)
+        Assert.assertTrue("Task should be executed", taskExecuted)
     }
 
     @Test
@@ -71,8 +68,8 @@ class CoroutineTaskScopeTest {
         Thread.sleep(20)
 
         // Then - runInterruptibleによりキャンセルが機能することを確認
-        assertTrue("Task should have started", taskStarted)
-        assertEquals(
+        Assert.assertTrue("Task should have started", taskStarted)
+        Assert.assertEquals(
             "Task should not complete after cancel",
             false,
             taskCompleted,
@@ -89,7 +86,7 @@ class CoroutineTaskScopeTest {
         try {
             cancelable.cancel()
         } catch (e: Exception) {
-            fail("Cancel should not throw exception: ${e.message}")
+            Assert.fail("Cancel should not throw exception: ${e.message}")
         }
     }
 
@@ -104,7 +101,7 @@ class CoroutineTaskScopeTest {
             cancelable.cancel()
             cancelable.cancel() // Should not cause issues
         } catch (e: Exception) {
-            fail("Multiple cancel calls should not throw exception: ${e.message}")
+            Assert.fail("Multiple cancel calls should not throw exception: ${e.message}")
         }
     }
 
@@ -140,10 +137,10 @@ class CoroutineTaskScopeTest {
         Thread.sleep(20)
 
         // Then - スコープがキャンセルされたため、タスクは完了しないはず
-        assertTrue("Task 1 should have started", task1Started)
-        assertTrue("Task 2 should have started", task2Started)
-        assertEquals("Task 1 should not complete after scope cancel", false, task1Completed)
-        assertEquals("Task 2 should not complete after scope cancel", false, task2Completed)
+        Assert.assertTrue("Task 1 should have started", task1Started)
+        Assert.assertTrue("Task 2 should have started", task2Started)
+        Assert.assertEquals("Task 1 should not complete after scope cancel", false, task1Completed)
+        Assert.assertEquals("Task 2 should not complete after scope cancel", false, task2Completed)
     }
 
     @Test
@@ -158,9 +155,9 @@ class CoroutineTaskScopeTest {
             cancelable.cancel() // 複数回のキャンセルが安全であることを確認
             cancelable.cancel() // さらにもう一度
 
-            assertTrue("Multiple cancel calls should be safe", true)
+            Assert.assertTrue("Multiple cancel calls should be safe", true)
         } catch (e: Exception) {
-            fail("Multiple cancel calls should not throw exception: ${e.message}")
+            Assert.fail("Multiple cancel calls should not throw exception: ${e.message}")
         }
     }
 }

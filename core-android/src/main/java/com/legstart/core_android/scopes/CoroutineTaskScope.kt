@@ -1,4 +1,4 @@
-package com.legstart.core_android
+package com.legstart.core_android.scopes
 
 import com.legstart.core.Cancelable
 import com.legstart.core.TaskScope
