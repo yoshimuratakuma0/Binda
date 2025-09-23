@@ -1,4 +1,4 @@
-package com.legstart.core_android
+package com.legstart.core_async
 
 import com.legstart.core.BoundTask
 import com.legstart.core.SingleTask

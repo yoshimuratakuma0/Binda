@@ -1,4 +1,4 @@
-package com.legstart.core_android.scopes
+package com.legstart.core_async.scopes
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

@@ -2,7 +2,7 @@ package com.legstart.binda
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.legstart.core_android.scopes.CoroutineTaskScope
+import com.legstart.core_async.scopes.CoroutineTaskScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 

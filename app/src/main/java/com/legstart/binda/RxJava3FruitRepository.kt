@@ -1,6 +1,6 @@
 package com.legstart.binda
 
-import com.legstart.core_android.RxJava3SingleTask
+import com.legstart.core_async.RxJava3SingleTask
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 

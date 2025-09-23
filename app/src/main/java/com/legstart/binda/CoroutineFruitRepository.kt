@@ -1,7 +1,7 @@
 package com.legstart.binda
 
 import com.legstart.core.SingleTask
-import com.legstart.core_android.CoroutineSingleTask
+import com.legstart.core_async.CoroutineSingleTask
 import kotlinx.coroutines.delay
 
 class CoroutineFruitRepository : FruitRepository {

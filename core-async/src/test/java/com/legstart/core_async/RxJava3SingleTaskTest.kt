@@ -1,6 +1,6 @@
-package com.legstart.core_android
+package com.legstart.core_async
 
-import com.legstart.core_android.scopes.CoroutineTaskScope
+import com.legstart.core_async.scopes.CoroutineTaskScope
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.TestScheduler
 import junit.framework.TestCase.assertEquals
