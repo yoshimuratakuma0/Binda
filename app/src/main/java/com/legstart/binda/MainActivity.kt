@@ -23,7 +23,7 @@ import com.legstart.binda.ui.theme.BindaTheme
 
 class MainActivity : ComponentActivity() {
     private val viewModel by lazy {
-        MainViewModel(CoroutineFruitRepository())
+        MainViewModel(RxJava3FruitRepository())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
