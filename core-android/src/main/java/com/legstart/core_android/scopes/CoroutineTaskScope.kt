@@ -21,6 +21,9 @@ class CoroutineTaskScope(
             }
         }
         return object : Cancelable {
+            override val isCancelled: Boolean
+                get() = job.isCancelled
+
             override fun cancel() {
                 job.cancel()
             }

@@ -6,5 +6,4 @@ import com.legstart.core.TaskScope
 
 interface SingleTask<T> {
     fun bindTo(taskScope: TaskScope): BoundTask<T>
-    fun cancel()
 }

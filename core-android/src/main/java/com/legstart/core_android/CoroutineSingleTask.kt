@@ -9,10 +9,12 @@ import kotlin.coroutines.cancellation.CancellationException
 class CoroutineSingleTask<T>(
     private val block: suspend () -> T
 ) : SingleTask<T> {
-    private var cancelable: Cancelable? = null
-
     override fun bindTo(taskScope: TaskScope): BoundTask<T> {
         return object : BoundTask<T> {
+            private lateinit var cancelable: Cancelable
+            override val isCancelled: Boolean
+                get() = cancelable.isCancelled
+
             override fun start(
                 onSuccess: (T) -> Unit,
                 onError: (Throwable) -> Unit,
@@ -23,6 +25,7 @@ class CoroutineSingleTask<T>(
                         val result = runBlocking { block() }
                         onSuccess(result)
                     } catch (_: CancellationException) {
+                        cancelable.cancel()
                         onCancel()
                     } catch (t: Throwable) {
                         onError(t)
@@ -31,12 +34,8 @@ class CoroutineSingleTask<T>(
             }
 
             override fun cancel() {
-                cancelable?.cancel()
+                cancelable.cancel()
             }
         }
-    }
-
-    override fun cancel() {
-        cancelable?.cancel()
     }
 }

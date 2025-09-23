@@ -11,9 +11,12 @@ class RxJava3SingleTask<T : Any>(
     private val single: Single<T>,
     private val scheduler: Scheduler = Schedulers.io(),
 ) : SingleTask<T> {
-    private var disposable: Disposable? = null
     override fun bindTo(taskScope: TaskScope): BoundTask<T> {
         return object : BoundTask<T> {
+            private lateinit var disposable: Disposable
+            override val isCancelled: Boolean
+                get() = disposable.isDisposed
+
             override fun start(
                 onSuccess: (T) -> Unit,
                 onError: (Throwable) -> Unit,
@@ -28,13 +31,9 @@ class RxJava3SingleTask<T : Any>(
             }
 
             override fun cancel() {
-                disposable?.dispose()
+                disposable.dispose()
             }
         }
-    }
-
-    override fun cancel() {
-        disposable?.dispose()
     }
 }
 

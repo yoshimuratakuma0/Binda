@@ -60,4 +60,65 @@ class RxJava3SingleTaskTest {
         assertNull("Expected no error but got: $error", error)
         assertTrue("Task should not be cancelled", !isCancelled)
     }
+
+    @Test
+    fun `RxJava3SingleTask should handle error correctly`() {
+        // Given
+        val expectedError = RuntimeException("Test Error")
+        val singleTask = RxJava3SingleTask<String>(
+            single = Single
+                .error(expectedError),
+            scheduler = scheduler,
+        )
+
+        // When
+        val boundTask = singleTask.bindTo(taskScope)
+        var actualResult: String? = null
+        var error: Throwable? = null
+        var isCancelled = false
+
+        boundTask.start(
+            onSuccess = { result -> actualResult = result },
+            onError = { throwable -> error = throwable },
+            onCancel = { isCancelled = true }
+        )
+
+        // 時間を進めてtimerを発火させる
+        scheduler.advanceTimeBy(10, TimeUnit.MILLISECONDS)
+
+        // Then
+        assertEquals("Expected no result but got: $actualResult", null, actualResult)
+        assertEquals("Expected error to be '$expectedError' but was '$error'", expectedError, error)
+        assertTrue("Task should not be cancelled", !isCancelled)
+    }
+
+    @Test
+    fun `RxJava3SingleTask cancellation should dispose the task`() {
+        // Given
+        val expectedResult = "Hello, RxJava3!"
+        val singleTask = RxJava3SingleTask(
+            single = Single
+                .timer(10, TimeUnit.MILLISECONDS, scheduler)
+                .map { expectedResult },
+            scheduler = scheduler,
+        )
+
+        // When
+        val boundTask = singleTask.bindTo(taskScope)
+        var actualResult: String? = null
+        var error: Throwable? = null
+
+        boundTask.start(
+            onSuccess = { result -> actualResult = result },
+            onError = { throwable -> error = throwable },
+            onCancel = { }
+        )
+        // 時間を進めてtimerを発火させる
+        boundTask.cancel()
+
+        // Then
+        assertEquals("Expected no result but got: $actualResult", null, actualResult)
+        assertNull("Expected no error but got: $error", error)
+        assertTrue("Task should be cancelled", boundTask.isCancelled)
+    }
 }
