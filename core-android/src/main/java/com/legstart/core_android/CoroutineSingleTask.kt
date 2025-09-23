@@ -2,6 +2,7 @@ package com.legstart.core_android
 
 import com.legstart.core.BoundTask
 import com.legstart.core.Cancelable
+import com.legstart.core.SingleTask
 import com.legstart.core.TaskScope
 import kotlinx.coroutines.runBlocking
 import kotlin.coroutines.cancellation.CancellationException

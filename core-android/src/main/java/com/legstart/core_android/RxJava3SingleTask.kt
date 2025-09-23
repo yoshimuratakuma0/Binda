@@ -1,6 +1,7 @@
 package com.legstart.core_android
 
 import com.legstart.core.BoundTask
+import com.legstart.core.SingleTask
 import com.legstart.core.TaskScope
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.core.Single
