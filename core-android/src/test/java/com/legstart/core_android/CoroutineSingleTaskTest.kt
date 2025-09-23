@@ -1,6 +1,7 @@
 package com.legstart.core_android
 
 import com.legstart.core_android.scopes.CoroutineTaskScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -61,5 +62,60 @@ class CoroutineSingleTaskTest {
         )
         assertNull(error)
         assertFalse(isCancelled)
+    }
+
+    @Test
+    fun `CoroutineSingleTask should handle exception`() = runTest {
+        // Given
+        val expected = IllegalStateException("Test Exception")
+        val singleTask = CoroutineSingleTask {
+            // Simulate some work that throws an exception
+            delay(10)
+            throw expected
+        }
+
+        // When
+        val boundTask = singleTask.bindTo(coroutineTaskScope)
+        var throwable: Throwable? = null
+        var isCancelled = false
+
+        boundTask.start(
+            onSuccess = { result -> },
+            onError = { t -> throwable = t },
+            onCancel = { isCancelled = true }
+        )
+
+        scheduler.advanceUntilIdle()
+
+
+        // Then
+        assertEquals(expected, throwable)
+        assertFalse(isCancelled)
+    }
+
+    @Test
+    fun `CoroutineSingleTask should handle cancellation`() = runTest {
+        // Given
+        val singleTask = CoroutineSingleTask {
+            // Simulate some work
+            delay(10)
+            throw CancellationException()
+        }
+
+        // When
+        val boundTask = singleTask.bindTo(coroutineTaskScope)
+        var error: Throwable? = null
+        var isCancelled = false
+
+        boundTask.start(
+            onSuccess = { result -> },
+            onError = { t -> error = t },
+            onCancel = { isCancelled = true }
+        )
+        scheduler.advanceUntilIdle()
+
+        // Then
+        assertNull(error)
+        assertEquals(true, isCancelled)
     }
 }

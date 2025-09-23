@@ -16,7 +16,7 @@ class CoroutineSingleTask<T>(
             override fun start(
                 onSuccess: (T) -> Unit,
                 onError: (Throwable) -> Unit,
-                onCancel: () -> Unit
+                onCancel: () -> Unit,
             ) {
                 cancelable = taskScope.launch {
                     try {
