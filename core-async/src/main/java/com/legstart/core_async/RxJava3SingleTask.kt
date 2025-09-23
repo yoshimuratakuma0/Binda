@@ -1,38 +1,42 @@
 package com.legstart.core_async
 
 import com.legstart.core.BoundTask
+import com.legstart.core.Cancelable
 import com.legstart.core.SingleTask
 import com.legstart.core.TaskScope
-import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.schedulers.Schedulers
 
 class RxJava3SingleTask<T : Any>(
     private val single: Single<T>,
-    private val scheduler: Scheduler = Schedulers.io(),
 ) : SingleTask<T> {
     override fun bindTo(taskScope: TaskScope): BoundTask<T> {
         return object : BoundTask<T> {
-            private lateinit var disposable: Disposable
+            private lateinit var cancelable: Cancelable
             override val isCancelled: Boolean
-                get() = disposable.isDisposed
+                get() = cancelable.isCancelled
 
             override fun start(
                 onSuccess: (T) -> Unit,
                 onError: (Throwable) -> Unit,
                 onCancel: () -> Unit
             ) {
-                disposable = single
-                    .subscribeOn(scheduler)
-                    .subscribe(
-                        { result: T -> onSuccess(result) },
-                        { error: Throwable -> onError(error) }
-                    )
+                cancelable = taskScope.launch {
+                    try {
+                        val result = single.blockingGet()
+                        if (isCancelled) {
+                            onCancel()
+                            return@launch
+                        }
+                        onSuccess(result)
+                    } catch (e: Exception) {
+                        onError(e)
+                        return@launch
+                    }
+                }
             }
 
             override fun cancel() {
-                disposable.dispose()
+                cancelable.cancel()
             }
         }
     }

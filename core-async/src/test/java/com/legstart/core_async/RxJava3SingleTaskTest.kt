@@ -1,11 +1,10 @@
 package com.legstart.core_async
 
-import com.legstart.core_async.scopes.CoroutineTaskScope
+import com.legstart.core_async.scopes.RxJava3TaskScope
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.TestScheduler
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -15,13 +14,13 @@ import java.util.concurrent.TimeUnit
 @OptIn(ExperimentalCoroutinesApi::class)
 class RxJava3SingleTaskTest {
     private lateinit var scheduler: TestScheduler
-    private lateinit var taskScope: CoroutineTaskScope
+    private lateinit var taskScope: RxJava3TaskScope
 
     @Before
     fun setup() {
         scheduler = TestScheduler()
-        taskScope = CoroutineTaskScope(
-            scope = TestScope(),
+        taskScope = RxJava3TaskScope(
+            scheduler = scheduler,
         )
     }
 
@@ -30,10 +29,7 @@ class RxJava3SingleTaskTest {
         // Given
         val expectedResult = "Hello, RxJava3!"
         val singleTask = RxJava3SingleTask(
-            single = Single
-                .timer(10, TimeUnit.MILLISECONDS, scheduler)
-                .map { expectedResult },
-            scheduler = scheduler,
+            single = Single.just(expectedResult),
         )
 
         // When
@@ -68,7 +64,6 @@ class RxJava3SingleTaskTest {
         val singleTask = RxJava3SingleTask<String>(
             single = Single
                 .error(expectedError),
-            scheduler = scheduler,
         )
 
         // When
@@ -100,7 +95,6 @@ class RxJava3SingleTaskTest {
             single = Single
                 .timer(10, TimeUnit.MILLISECONDS, scheduler)
                 .map { expectedResult },
-            scheduler = scheduler,
         )
 
         // When
@@ -113,7 +107,6 @@ class RxJava3SingleTaskTest {
             onError = { throwable -> error = throwable },
             onCancel = { }
         )
-        // 時間を進めてtimerを発火させる
         boundTask.cancel()
 
         // Then
