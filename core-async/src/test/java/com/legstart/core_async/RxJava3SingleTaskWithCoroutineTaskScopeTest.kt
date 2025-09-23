@@ -2,6 +2,7 @@ package com.legstart.core_async
 
 import com.legstart.core_async.scopes.CoroutineTaskScope
 import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.schedulers.TestScheduler
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -95,7 +96,7 @@ class RxJava3SingleTaskWithCoroutineTaskScopeTest {
 
     @Test
     fun `RxJava3SingleTask cancellation should dispose the task`() {
-        val rxScheduler = io.reactivex.rxjava3.schedulers.TestScheduler()
+        val rxScheduler = TestScheduler()
         // Given
         val expectedResult = "Hello, RxJava3!"
         val singleTask = RxJava3SingleTask(

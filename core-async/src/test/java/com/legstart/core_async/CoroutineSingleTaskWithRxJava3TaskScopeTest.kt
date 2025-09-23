@@ -1,35 +1,26 @@
 package com.legstart.core_async
 
-import com.legstart.core_async.scopes.CoroutineTaskScope
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
+import com.legstart.core_async.scopes.RxJava3TaskScope
+import io.reactivex.rxjava3.schedulers.Schedulers
+import io.reactivex.rxjava3.schedulers.TestScheduler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestCoroutineScheduler
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class CoroutineSingleTaskTest {
+class CoroutineSingleTaskWithRxJava3TaskScopeTest {
 
-    private lateinit var scheduler: TestCoroutineScheduler
-    private lateinit var dispatcher: CoroutineDispatcher
-    private lateinit var coroutineTaskScope: CoroutineTaskScope
+    private lateinit var scheduler: TestScheduler
+    private lateinit var taskScope: RxJava3TaskScope
 
     @Before
     fun setup() {
-        scheduler = TestCoroutineScheduler()
-        dispatcher = StandardTestDispatcher(scheduler)
-        coroutineTaskScope = CoroutineTaskScope(
-            scope = TestScope(scheduler),
-            dispatcher = dispatcher,
+        scheduler = TestScheduler()
+        taskScope = RxJava3TaskScope(
+            scheduler = scheduler,
         )
     }
 
@@ -44,7 +35,7 @@ class CoroutineSingleTaskTest {
         }
 
         // When
-        val boundTask = singleTask.bindTo(coroutineTaskScope)
+        val boundTask = singleTask.bindTo(taskScope)
         var actualResult: String? = null
         var error: Throwable? = null
         var isCancelled = false
@@ -54,15 +45,15 @@ class CoroutineSingleTaskTest {
             onError = { throwable -> error = throwable },
             onCancel = { isCancelled = true }
         )
-        scheduler.advanceUntilIdle()
+        scheduler.triggerActions()
 
         // Then
-        assertEquals(
+        Assert.assertEquals(
             expectedResult,
             actualResult,
         )
-        assertNull(error)
-        assertFalse(isCancelled)
+        Assert.assertNull(error)
+        Assert.assertFalse(isCancelled)
     }
 
     @Test
@@ -76,7 +67,7 @@ class CoroutineSingleTaskTest {
         }
 
         // When
-        val boundTask = singleTask.bindTo(coroutineTaskScope)
+        val boundTask = singleTask.bindTo(taskScope)
         var throwable: Throwable? = null
         var isCancelled = false
 
@@ -86,12 +77,12 @@ class CoroutineSingleTaskTest {
             onCancel = { isCancelled = true }
         )
 
-        scheduler.advanceUntilIdle()
+        scheduler.triggerActions()
 
 
         // Then
-        assertEquals(expected, throwable)
-        assertFalse(isCancelled)
+        Assert.assertEquals(expected, throwable)
+        Assert.assertFalse(isCancelled)
     }
 
     @Test
@@ -100,11 +91,11 @@ class CoroutineSingleTaskTest {
         val singleTask = CoroutineSingleTask {
             // Simulate some work
             delay(10)
-            throw CancellationException()
+            throw kotlinx.coroutines.CancellationException()
         }
 
         // When
-        val boundTask = singleTask.bindTo(coroutineTaskScope)
+        val boundTask = singleTask.bindTo(taskScope)
         var error: Throwable? = null
         var isCancelled = false
 
@@ -115,12 +106,12 @@ class CoroutineSingleTaskTest {
                 isCancelled = true
             }
         )
-        scheduler.advanceUntilIdle()
+        scheduler.triggerActions()
 
         // Then
-        assertNull(error)
-        assertEquals(true, isCancelled)
-        assertEquals(true, boundTask.isCancelled)
+        Assert.assertNull(error)
+        Assert.assertEquals(true, isCancelled)
+        Assert.assertEquals(true, boundTask.isCancelled)
     }
 
     @Test
@@ -136,9 +127,8 @@ class CoroutineSingleTaskTest {
         }
 
         // When
-        val ioCoroutineTaskScope = CoroutineTaskScope(
-            scope = TestScope(scheduler),
-            dispatcher = Dispatchers.IO,
+        val ioCoroutineTaskScope = RxJava3TaskScope(
+            scheduler = Schedulers.io(),
         )
         val boundTask = singleTask.bindTo(ioCoroutineTaskScope)
         var error: Throwable? = null
@@ -153,9 +143,9 @@ class CoroutineSingleTaskTest {
         delay(100) // Ensure the task has started
         boundTask.cancel()
 
-        assertEquals(true, taskStarted)
-        assertEquals(false, taskCompleted)
-        assertNull(error)
-        assertEquals(true, boundTask.isCancelled)
+        Assert.assertEquals(true, taskStarted)
+        Assert.assertEquals(false, taskCompleted)
+        Assert.assertNull(error)
+        Assert.assertEquals(true, boundTask.isCancelled)
     }
 }
