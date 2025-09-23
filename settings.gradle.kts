@@ -22,4 +22,4 @@ dependencyResolutionManagement {
 rootProject.name = "Binda"
 include(":app")
 include(":core")
-include(":core-android")
+include(":core-async")
