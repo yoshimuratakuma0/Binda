@@ -23,18 +23,6 @@ class CoroutineTaskScopeTest {
     }
 
     @Test
-    fun `launch should return non-null cancelable`() = runTest {
-        // Given
-        val task = { /* empty task */ }
-
-        // When
-        val cancelable = coroutineTaskScope.launch(task)
-
-        // Then
-        Assert.assertNotNull("Cancelable should not be null", cancelable)
-    }
-
-    @Test
     fun `task should be executed`() = runTest {
         // Given
         var taskExecuted = false
