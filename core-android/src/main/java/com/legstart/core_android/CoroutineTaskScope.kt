@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runInterruptible
 
 class CoroutineTaskScope(
     private val scope: CoroutineScope,
@@ -15,7 +16,9 @@ class CoroutineTaskScope(
         task: () -> Unit,
     ): Cancelable {
         val job = scope.launch(dispatcher) {
-            task()
+            runInterruptible {
+                task()
+            }
         }
         return object : Cancelable {
             override fun cancel() {

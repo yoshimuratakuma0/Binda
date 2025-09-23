@@ -1,6 +1,5 @@
 package com.legstart.core_android
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.testing.TestLifecycleOwner
 import kotlinx.coroutines.CoroutineDispatcher
@@ -17,15 +16,10 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
 class LifecycleTaskScopeTest {
-
-    @get:Rule
-    val instantTaskExecutorRule = InstantTaskExecutorRule()
-
     private lateinit var lifecycleOwner: TestLifecycleOwner
     private lateinit var testDispatcher: CoroutineDispatcher
     private lateinit var lifecycleTaskScope: LifecycleTaskScope
