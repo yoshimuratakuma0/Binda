@@ -1,10 +1,13 @@
 package com.legstart.core_async
 
-import com.legstart.core_async.scopes.RxJava3TaskScope
+import com.legstart.core_async.scopes.CoroutineTaskScope
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.schedulers.TestScheduler
 import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestCoroutineScheduler
+import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -12,15 +15,18 @@ import org.junit.Test
 import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class RxJava3SingleTaskTest {
-    private lateinit var scheduler: TestScheduler
-    private lateinit var taskScope: RxJava3TaskScope
+class RxJava3SingleTaskWithCoroutineTaskScopeTest {
+    private lateinit var scheduler: TestCoroutineScheduler
+    private lateinit var dispatcher: CoroutineDispatcher
+    private lateinit var taskScope: CoroutineTaskScope
 
     @Before
     fun setup() {
-        scheduler = TestScheduler()
-        taskScope = RxJava3TaskScope(
-            scheduler = scheduler,
+        scheduler = TestCoroutineScheduler()
+        dispatcher = StandardTestDispatcher(scheduler)
+        taskScope = CoroutineTaskScope(
+            scope = TestScope(scheduler),
+            dispatcher = dispatcher,
         )
     }
 
@@ -45,7 +51,7 @@ class RxJava3SingleTaskTest {
         )
 
         // 時間を進めてtimerを発火させる
-        scheduler.advanceTimeBy(10, TimeUnit.MILLISECONDS)
+        scheduler.advanceUntilIdle()
 
         // Then
         assertEquals(
@@ -79,7 +85,7 @@ class RxJava3SingleTaskTest {
         )
 
         // 時間を進めてtimerを発火させる
-        scheduler.advanceTimeBy(10, TimeUnit.MILLISECONDS)
+        scheduler.advanceUntilIdle()
 
         // Then
         assertEquals("Expected no result but got: $actualResult", null, actualResult)
@@ -89,11 +95,12 @@ class RxJava3SingleTaskTest {
 
     @Test
     fun `RxJava3SingleTask cancellation should dispose the task`() {
+        val rxScheduler = io.reactivex.rxjava3.schedulers.TestScheduler()
         // Given
         val expectedResult = "Hello, RxJava3!"
         val singleTask = RxJava3SingleTask(
             single = Single
-                .timer(10, TimeUnit.MILLISECONDS, scheduler)
+                .timer(10, TimeUnit.MILLISECONDS, rxScheduler)
                 .map { expectedResult },
         )
 
