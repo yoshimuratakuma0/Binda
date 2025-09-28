@@ -1,5 +1,6 @@
 package com.legstart.core_async.scopes
 
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -8,9 +9,13 @@ import org.junit.Test
 class RxJava3TaskScopeTest {
     private lateinit var taskScope: RxJava3TaskScope
 
+    private lateinit var disposableContainer: CompositeDisposable
+
     @Before
     fun setup() {
+        disposableContainer = CompositeDisposable()
         taskScope = RxJava3TaskScope(
+            disposableContainer = disposableContainer,
             scheduler = Schedulers.trampoline(),
         )
     }
@@ -32,14 +37,16 @@ class RxJava3TaskScopeTest {
         val task = {
             taskStarted = true
             // Simulate long-running task
-            Thread.sleep(10)
+            Thread.sleep(100)
             taskCompleted = true
         }
 
         val ioTaskScope = RxJava3TaskScope(
+            disposableContainer = CompositeDisposable(),
             scheduler = Schedulers.io(),
         )
         val cancelable = ioTaskScope.launch(task)
+        Thread.sleep(5)
         cancelable.cancel()
 
         Thread.sleep(30)
@@ -63,5 +70,15 @@ class RxJava3TaskScopeTest {
 
         assertTrue("Task 1 should be executed", task1Executed)
         assertTrue("Task 2 should be executed", task2Executed)
+    }
+
+    @Test
+    fun `disposables should be disposed after scope is canceled`() {
+        val cancelable1 = taskScope.launch { Thread.sleep(10) }
+        val cancelable2 = taskScope.launch { Thread.sleep(10) }
+        taskScope.cancel()
+
+        assertTrue("Cancelable 1 should be cancelled", cancelable1.isCancelled)
+        assertTrue("Cancelable 2 should be cancelled", cancelable2.isCancelled)
     }
 }

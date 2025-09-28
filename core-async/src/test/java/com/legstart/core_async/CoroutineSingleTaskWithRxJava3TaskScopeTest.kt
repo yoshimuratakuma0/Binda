@@ -1,6 +1,7 @@
 package com.legstart.core_async
 
 import com.legstart.core_async.scopes.RxJava3TaskScope
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.schedulers.TestScheduler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -16,10 +17,14 @@ class CoroutineSingleTaskWithRxJava3TaskScopeTest {
     private lateinit var scheduler: TestScheduler
     private lateinit var taskScope: RxJava3TaskScope
 
+    private lateinit var disposableContainer: CompositeDisposable
+
     @Before
     fun setup() {
+        disposableContainer = CompositeDisposable()
         scheduler = TestScheduler()
         taskScope = RxJava3TaskScope(
+            disposableContainer = disposableContainer,
             scheduler = scheduler,
         )
     }
@@ -129,6 +134,7 @@ class CoroutineSingleTaskWithRxJava3TaskScopeTest {
         // When
         val ioCoroutineTaskScope = RxJava3TaskScope(
             scheduler = Schedulers.io(),
+            disposableContainer = CompositeDisposable(),
         )
         val boundTask = singleTask.bindTo(ioCoroutineTaskScope)
         var error: Throwable? = null

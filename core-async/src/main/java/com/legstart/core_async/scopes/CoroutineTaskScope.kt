@@ -5,6 +5,7 @@ import com.legstart.core.TaskScope
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runInterruptible
 
@@ -28,5 +29,9 @@ class CoroutineTaskScope(
                 job.cancel()
             }
         }
+    }
+
+    override fun cancel() {
+        scope.cancel()
     }
 }

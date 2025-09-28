@@ -2,6 +2,7 @@ package com.legstart.core_async
 
 import com.legstart.core_async.scopes.RxJava3TaskScope
 import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.TestScheduler
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -20,6 +21,7 @@ class RxJava3SingleTaskWithRxJava3TaskScopeTest {
     fun setup() {
         scheduler = TestScheduler()
         taskScope = RxJava3TaskScope(
+            disposableContainer = CompositeDisposable(),
             scheduler = scheduler,
         )
     }

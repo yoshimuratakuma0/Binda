@@ -5,18 +5,21 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
 class CoroutineTaskScopeTest {
-    private lateinit var coroutineTaskScope: CoroutineTaskScope
+    private lateinit var ioCoroutineTaskScope: CoroutineTaskScope
 
     @Before
     fun setup() {
-        coroutineTaskScope = CoroutineTaskScope(
+        ioCoroutineTaskScope = CoroutineTaskScope(
             scope = CoroutineScope(Dispatchers.IO),
             dispatcher = Dispatchers.IO,
         )
@@ -24,6 +27,13 @@ class CoroutineTaskScopeTest {
 
     @Test
     fun `task should be executed`() = runTest {
+        val dispatcher = StandardTestDispatcher(
+            scheduler = testScheduler,
+        )
+        val coroutineTaskScope = CoroutineTaskScope(
+            scope = CoroutineScope(dispatcher),
+            dispatcher = dispatcher,
+        )
         // Given
         var taskExecuted = false
         val task = { taskExecuted = true }
@@ -31,11 +41,11 @@ class CoroutineTaskScopeTest {
         // When
         coroutineTaskScope.launch(task)
 
-        // IOディスパッチャーで実行されるため、タスク完了を待つ
-        Thread.sleep(10)
+        // dispatcherで実行されるため、タスク完了を待つ
+        advanceUntilIdle()
 
         // Then
-        Assert.assertTrue("Task should be executed", taskExecuted)
+        assertTrue("Task should be executed", taskExecuted)
     }
 
     @Test
@@ -49,14 +59,14 @@ class CoroutineTaskScopeTest {
             taskCompleted = true
         }
 
-        val cancelable = coroutineTaskScope.launch(task)
+        val cancelable = ioCoroutineTaskScope.launch(task)
         // タスクが開始されるのを待つ
         Thread.sleep(5)
         cancelable.cancel()
         Thread.sleep(20)
 
         // Then - runInterruptibleによりキャンセルが機能することを確認
-        Assert.assertTrue("Task should have started", taskStarted)
+        assertTrue("Task should have started", taskStarted)
         Assert.assertEquals(
             "Task should not complete after cancel",
             false,
@@ -68,7 +78,7 @@ class CoroutineTaskScopeTest {
     fun `cancel should not throw exception`() = runTest {
         // Given
         val task = { /* empty task */ }
-        val cancelable = coroutineTaskScope.launch(task)
+        val cancelable = ioCoroutineTaskScope.launch(task)
 
         // When & Then
         try {
@@ -82,7 +92,7 @@ class CoroutineTaskScopeTest {
     fun `multiple cancel calls should not throw exception`() = runTest {
         // Given
         val task = { /* empty task */ }
-        val cancelable = coroutineTaskScope.launch(task)
+        val cancelable = ioCoroutineTaskScope.launch(task)
 
         // When & Then
         try {
@@ -125,8 +135,8 @@ class CoroutineTaskScopeTest {
         Thread.sleep(20)
 
         // Then - スコープがキャンセルされたため、タスクは完了しないはず
-        Assert.assertTrue("Task 1 should have started", task1Started)
-        Assert.assertTrue("Task 2 should have started", task2Started)
+        assertTrue("Task 1 should have started", task1Started)
+        assertTrue("Task 2 should have started", task2Started)
         Assert.assertEquals("Task 1 should not complete after scope cancel", false, task1Completed)
         Assert.assertEquals("Task 2 should not complete after scope cancel", false, task2Completed)
     }
@@ -135,7 +145,7 @@ class CoroutineTaskScopeTest {
     fun `multiple cancel calls should be safe`() = runTest {
         // Given
         val task = { /* empty task */ }
-        val cancelable = coroutineTaskScope.launch(task)
+        val cancelable = ioCoroutineTaskScope.launch(task)
 
         // When & Then
         try {
@@ -143,9 +153,34 @@ class CoroutineTaskScopeTest {
             cancelable.cancel() // 複数回のキャンセルが安全であることを確認
             cancelable.cancel() // さらにもう一度
 
-            Assert.assertTrue("Multiple cancel calls should be safe", true)
+            assertTrue("Multiple cancel calls should be safe", true)
         } catch (e: Exception) {
             Assert.fail("Multiple cancel calls should not throw exception: ${e.message}")
         }
+    }
+
+    @Test
+    fun `cancel all jobs after scope canceled`() = runTest {
+        val dispatcher = StandardTestDispatcher(
+            scheduler = testScheduler,
+        )
+        val coroutineTaskScope = CoroutineTaskScope(
+            scope = CoroutineScope(dispatcher),
+            dispatcher = dispatcher,
+        )
+        // Given
+        val cancelable1 = coroutineTaskScope.launch { /* empty task */ }
+        val cancelable2 = coroutineTaskScope.launch { /* empty task */ }
+        val cancelable3 = coroutineTaskScope.launch { /* empty task */ }
+
+
+        // When
+        coroutineTaskScope.cancel()
+        testScheduler.advanceUntilIdle()
+
+        // Then
+        assertTrue(cancelable1.isCancelled)
+        assertTrue(cancelable2.isCancelled)
+        assertTrue(cancelable3.isCancelled)
     }
 }
