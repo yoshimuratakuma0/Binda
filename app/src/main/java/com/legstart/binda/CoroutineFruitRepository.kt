@@ -7,7 +7,7 @@ import kotlinx.coroutines.delay
 class CoroutineFruitRepository : FruitRepository {
     override fun fetchFruits(): SingleTask<List<String>> {
         return CoroutineSingleTask {
-            delay(3000)
+            delay(2000)
             listOf("Apple", "Banana", "Orange")
         }
     }

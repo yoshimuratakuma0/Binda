@@ -25,7 +25,11 @@ import com.legstart.binda.ui.theme.BindaTheme
 
 class MainActivity : ComponentActivity() {
     private val coroutineViewModel by lazy {
-        CoroutineViewModel(RxJava3FruitRepository())
+        CoroutineViewModel(CoroutineFruitRepository())
+    }
+
+    private val rxJava3ViewModel by lazy {
+        RxJava3ViewModel(RxJava3FruitRepository())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,9 +39,13 @@ class MainActivity : ComponentActivity() {
             BindaTheme {
                 val fruitsByCoroutine by coroutineViewModel.fruits.collectAsStateWithLifecycle()
                 val isLoadingByCoroutine by coroutineViewModel.isLoading.collectAsStateWithLifecycle()
+                val fruitsByRxJava3 by rxJava3ViewModel.fruits.collectAsStateWithLifecycle()
+                val isLoadingByRxJava3 by rxJava3ViewModel.isLoading.collectAsStateWithLifecycle()
                 MainScreen(
                     isLoadingByCoroutine = isLoadingByCoroutine,
                     fruitsByCoroutine = fruitsByCoroutine,
+                    isLoadingByRxJava3 = isLoadingByRxJava3,
+                    fruitsByRxJava3 = fruitsByRxJava3,
                 )
             }
         }
@@ -48,8 +56,11 @@ class MainActivity : ComponentActivity() {
 fun MainScreen(
     isLoadingByCoroutine: Boolean,
     fruitsByCoroutine: List<String>,
+    isLoadingByRxJava3: Boolean,
+    fruitsByRxJava3: List<String>,
+    modifier: Modifier = Modifier,
 ) {
-    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+    Scaffold(modifier = modifier.fillMaxSize()) { innerPadding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize(),
@@ -62,6 +73,20 @@ fun MainScreen(
                 FruitsScreen(
                     isLoading = isLoadingByCoroutine,
                     fruits = fruitsByCoroutine,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+            item {
+                HorizontalDivider()
+            }
+
+            item {
+                Text(text = "Fruits from RxJava3")
+            }
+            item {
+                FruitsScreen(
+                    isLoading = isLoadingByRxJava3,
+                    fruits = fruitsByRxJava3,
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
@@ -104,17 +129,8 @@ fun MainScreenPreview() {
         MainScreen(
             isLoadingByCoroutine = false,
             fruitsByCoroutine = listOf("banana", "apple", "orange"),
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun LoadingPreview() {
-    BindaTheme {
-        FruitsScreen(
-            fruits = emptyList(),
-            isLoading = true,
+            isLoadingByRxJava3 = false,
+            fruitsByRxJava3 = listOf("lemon", "grape", "kiwi"),
         )
     }
 }

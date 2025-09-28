@@ -8,7 +8,7 @@ class RxJava3FruitRepository : FruitRepository {
         return RxJava3SingleTask(
             single = Single
                 .timer(3, java.util.concurrent.TimeUnit.SECONDS)
-                .map { listOf("Apple", "Banana", "Orange") },
+                .map { listOf("Lemon", "Grape", "Kiwi") },
         )
     }
 }
