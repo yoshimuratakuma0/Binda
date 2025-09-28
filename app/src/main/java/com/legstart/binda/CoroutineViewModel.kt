@@ -6,7 +6,7 @@ import com.legstart.core_async.scopes.CoroutineTaskScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class MainViewModel(
+class CoroutineViewModel(
     fruitRepository: FruitRepository,
 ) : ViewModel() {
     private val taskScope = CoroutineTaskScope(
