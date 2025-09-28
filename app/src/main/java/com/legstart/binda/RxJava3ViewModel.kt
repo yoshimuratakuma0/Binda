@@ -1,16 +1,20 @@
 package com.legstart.binda
 
 import androidx.lifecycle.ViewModel
+import com.legstart.core.TaskScope
 import com.legstart.core_async.scopes.RxJava3TaskScope
+import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class RxJava3ViewModel(
+    ioScheduler: Scheduler,
     fruitRepository: FruitRepository,
 ) : ViewModel() {
 
-    private val taskScope = RxJava3TaskScope(
+    private val taskScope: TaskScope = RxJava3TaskScope(
+        scheduler = ioScheduler,
         disposableContainer = CompositeDisposable(),
     )
     private val _fruits = MutableStateFlow<List<String>>(emptyList())
@@ -22,7 +26,8 @@ class RxJava3ViewModel(
     init {
         val task = fruitRepository.fetchFruits()
         _isLoading.value = true
-        task.bindTo(taskScope).start(
+        val boundTask = task.bindTo(taskScope)
+        boundTask.start(
             onSuccess = { result ->
                 _fruits.value = result
                 _isLoading.value = false

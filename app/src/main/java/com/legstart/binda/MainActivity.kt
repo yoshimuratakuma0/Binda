@@ -22,14 +22,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.legstart.binda.ui.theme.BindaTheme
+import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
 
 class MainActivity : ComponentActivity() {
     private val coroutineViewModel by lazy {
-        CoroutineViewModel(CoroutineFruitRepository())
+        CoroutineViewModel(
+            fruitRepository = CoroutineFruitRepository(),
+            ioDispatcher = Dispatchers.IO,
+        )
     }
 
     private val rxJava3ViewModel by lazy {
-        RxJava3ViewModel(RxJava3FruitRepository())
+        RxJava3ViewModel(
+            ioScheduler = Schedulers.io(),
+            fruitRepository = RxJava3FruitRepository(),
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

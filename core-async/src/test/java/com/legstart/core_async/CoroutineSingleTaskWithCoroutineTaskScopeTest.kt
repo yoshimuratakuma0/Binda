@@ -3,6 +3,7 @@ package com.legstart.core_async
 import com.legstart.core_async.scopes.CoroutineTaskScope
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -137,7 +138,7 @@ class CoroutineSingleTaskWithCoroutineTaskScopeTest {
 
         // When
         val ioCoroutineTaskScope = CoroutineTaskScope(
-            scope = TestScope(scheduler),
+            scope = CoroutineScope(Dispatchers.IO),
             dispatcher = Dispatchers.IO,
         )
         val boundTask = singleTask.bindTo(ioCoroutineTaskScope)
