@@ -5,7 +5,7 @@ import com.legstart.core.Cancelable
 import com.legstart.core.TaskScope
 import io.reactivex.rxjava3.core.Single
 
-class RxJava3BoundTask<T : Any>(
+internal class RxJava3BoundTask<T : Any>(
     private val taskScope: TaskScope,
     private val single: Single<T>,
 ) : BoundTask<T> {

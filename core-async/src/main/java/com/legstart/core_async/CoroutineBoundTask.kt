@@ -5,7 +5,7 @@ import com.legstart.core.Cancelable
 import com.legstart.core.TaskScope
 import kotlinx.coroutines.runBlocking
 
-class CoroutineBoundTask<T>(
+internal class CoroutineBoundTask<T>(
     private val taskScope: TaskScope,
     private val block: suspend () -> T,
 ) : BoundTask<T> {
