@@ -1,12 +1,16 @@
 plugins {
     id("java-library")
     alias(libs.plugins.jetbrains.kotlin.jvm)
-    id("signing")
     id("com.vanniktech.maven.publish") version "0.34.0"
 }
 
-kotlin { compilerOptions { jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11 } }
+kotlin {
+    compilerOptions { jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21 }
+}
 
+java {
+    toolchain { languageVersion.set(JavaLanguageVersion.of(21)) }
+}
 dependencies {
     implementation(project(":core"))
     implementation(libs.rxjava3)

@@ -1,14 +1,18 @@
 plugins {
     id("java-library")
     alias(libs.plugins.jetbrains.kotlin.jvm)
-    id("signing")
     id("com.vanniktech.maven.publish") version "0.34.0"
 }
 
-kotlin { compilerOptions { jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11 } }
+kotlin {
+    compilerOptions { jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21 }
+}
+
+java {
+    toolchain { languageVersion.set(JavaLanguageVersion.of(21)) }
+}
 
 val artifactVersion = "1.0.0"
-val isSnapshot = artifactVersion.endsWith("-SNAPSHOT")
 mavenPublishing {
     coordinates("com.legstart", "binda-core", artifactVersion)
 
