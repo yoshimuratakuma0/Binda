@@ -5,7 +5,7 @@ import com.legstart.core.SingleTask
 import com.legstart.core.TaskScope
 import io.reactivex.rxjava3.core.Single
 
-class RxJava3SingleTask<T : Any>(
+internal class RxJava3SingleTask<T : Any>(
     private val single: Single<T>,
 ) : SingleTask<T> {
     override fun bindTo(taskScope: TaskScope): BoundTask<T> {
@@ -16,3 +16,6 @@ class RxJava3SingleTask<T : Any>(
     }
 }
 
+fun <T : Any> rxJava3SingleTask(single: Single<T>): SingleTask<T> {
+    return RxJava3SingleTask(single = single)
+}
