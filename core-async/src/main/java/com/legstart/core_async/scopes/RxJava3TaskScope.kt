@@ -6,16 +6,16 @@ import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 
-class RxJava3TaskScope(
-    private val disposableContainer: CompositeDisposable,
-    private val scheduler: Scheduler = Schedulers.io(),
+internal class RxJava3TaskScope(
+    private val compositeDisposable: CompositeDisposable,
+    private val scheduler: Scheduler,
 ) : TaskScope {
     override fun launch(task: () -> Unit): Cancelable {
         val worker = scheduler.createWorker()
         val disposable = worker.schedule {
             task()
         }
-        disposableContainer.add(disposable)
+        compositeDisposable.add(disposable)
         return object : Cancelable {
             override val isCancelled: Boolean
                 get() = disposable.isDisposed
@@ -27,6 +27,13 @@ class RxJava3TaskScope(
     }
 
     override fun cancel() {
-        disposableContainer.clear()
+        compositeDisposable.clear()
     }
+}
+
+fun rxJava3TaskScope(
+    compositionDisposable: CompositeDisposable,
+    scheduler: Scheduler = Schedulers.io(),
+): TaskScope {
+    return RxJava3TaskScope(compositionDisposable, scheduler)
 }

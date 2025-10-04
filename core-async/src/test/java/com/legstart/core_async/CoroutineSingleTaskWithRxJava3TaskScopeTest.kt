@@ -24,7 +24,7 @@ class CoroutineSingleTaskWithRxJava3TaskScopeTest {
         disposableContainer = CompositeDisposable()
         scheduler = TestScheduler()
         taskScope = RxJava3TaskScope(
-            disposableContainer = disposableContainer,
+            compositeDisposable = disposableContainer,
             scheduler = scheduler,
         )
     }
@@ -134,7 +134,7 @@ class CoroutineSingleTaskWithRxJava3TaskScopeTest {
         // When
         val ioCoroutineTaskScope = RxJava3TaskScope(
             scheduler = Schedulers.io(),
-            disposableContainer = CompositeDisposable(),
+            compositeDisposable = CompositeDisposable(),
         )
         val boundTask = singleTask.bindTo(ioCoroutineTaskScope)
         var error: Throwable? = null
@@ -146,7 +146,7 @@ class CoroutineSingleTaskWithRxJava3TaskScopeTest {
                 // No-op
             }
         )
-        delay(100) // Ensure the task has started
+        delay(300) // Ensure the task has started
         boundTask.cancel()
 
         Assert.assertEquals(true, taskStarted)

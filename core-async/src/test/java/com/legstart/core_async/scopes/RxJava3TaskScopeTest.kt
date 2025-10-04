@@ -15,7 +15,7 @@ class RxJava3TaskScopeTest {
     fun setup() {
         disposableContainer = CompositeDisposable()
         taskScope = RxJava3TaskScope(
-            disposableContainer = disposableContainer,
+            compositeDisposable = disposableContainer,
             scheduler = Schedulers.trampoline(),
         )
     }
@@ -42,7 +42,7 @@ class RxJava3TaskScopeTest {
         }
 
         val ioTaskScope = RxJava3TaskScope(
-            disposableContainer = CompositeDisposable(),
+            compositeDisposable = CompositeDisposable(),
             scheduler = Schedulers.io(),
         )
         val cancelable = ioTaskScope.launch(task)

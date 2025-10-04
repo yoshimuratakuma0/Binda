@@ -21,7 +21,7 @@ class RxJava3SingleTaskWithRxJava3TaskScopeTest {
     fun setup() {
         scheduler = TestScheduler()
         taskScope = RxJava3TaskScope(
-            disposableContainer = CompositeDisposable(),
+            compositeDisposable = CompositeDisposable(),
             scheduler = scheduler,
         )
     }

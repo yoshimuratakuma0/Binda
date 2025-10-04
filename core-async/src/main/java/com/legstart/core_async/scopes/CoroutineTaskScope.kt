@@ -9,9 +9,9 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runInterruptible
 
-class CoroutineTaskScope(
+internal class CoroutineTaskScope(
     private val scope: CoroutineScope,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
+    private val dispatcher: CoroutineDispatcher,
 ) : TaskScope {
     override fun launch(
         task: () -> Unit,
@@ -35,3 +35,8 @@ class CoroutineTaskScope(
         scope.cancel()
     }
 }
+
+fun coroutineTaskScope(
+    scope: CoroutineScope,
+    dispatcher: CoroutineDispatcher = Dispatchers.Default,
+): TaskScope = CoroutineTaskScope(scope, dispatcher)

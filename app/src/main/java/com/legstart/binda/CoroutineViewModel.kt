@@ -3,7 +3,7 @@ package com.legstart.binda
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.legstart.core.TaskScope
-import com.legstart.core_async.scopes.CoroutineTaskScope
+import com.legstart.core_async.scopes.coroutineTaskScope
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,7 +12,7 @@ class CoroutineViewModel(
     ioDispatcher: CoroutineDispatcher,
     fruitRepository: FruitRepository,
 ) : ViewModel() {
-    private val taskScope: TaskScope = CoroutineTaskScope(
+    private val taskScope: TaskScope = coroutineTaskScope(
         scope = viewModelScope,
         dispatcher = ioDispatcher,
     )

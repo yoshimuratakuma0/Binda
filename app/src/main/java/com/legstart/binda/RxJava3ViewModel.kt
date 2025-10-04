@@ -1,8 +1,7 @@
 package com.legstart.binda
 
 import androidx.lifecycle.ViewModel
-import com.legstart.core.TaskScope
-import com.legstart.core_async.scopes.RxJava3TaskScope
+import com.legstart.core_async.scopes.rxJava3TaskScope
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,9 +12,9 @@ class RxJava3ViewModel(
     fruitRepository: FruitRepository,
 ) : ViewModel() {
 
-    private val taskScope: TaskScope = RxJava3TaskScope(
+    private val taskScope = rxJava3TaskScope(
         scheduler = ioScheduler,
-        disposableContainer = CompositeDisposable(),
+        compositionDisposable = CompositeDisposable(),
     )
     private val _fruits = MutableStateFlow<List<String>>(emptyList())
     val fruits = _fruits.asStateFlow()
