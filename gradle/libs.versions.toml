@@ -12,6 +12,8 @@ composeBom = "2025.09.00"
 jetbrainsKotlinJvm = "2.2.20"
 mockk = "1.14.5"
 rxjava3 = "3.1.11"
+# Added common artifact version for Binda modules
+binda = "1.0.1"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }

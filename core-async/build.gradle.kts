@@ -20,7 +20,7 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
 }
 
-val artifactVersion = "1.0.0"
+val artifactVersion: String = libs.versions.binda.get()
 mavenPublishing {
     coordinates("com.legstart", "binda-core-async", artifactVersion)
 
